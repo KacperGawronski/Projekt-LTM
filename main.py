@@ -12,4 +12,4 @@ token=Tokenize('\\neg(\\forall_{x\in Y}((y<x<z) \\lor P(x))\\leftrightarrow (x<z
 print(token)
 print(token.neg(1))
 print(token.neg(2))
-print(token.neg_total())
+print(token.eliminate_ie())
