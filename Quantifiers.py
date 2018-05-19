@@ -59,6 +59,7 @@ class Quantifier(Token):
 		for i in self.get_variables():
 			values_pairs[i]=bool(input(i+': '))
 		self.content.set_values(values_pairs)
+
 class Forall(Quantifier):
 	def describe(self,deepness=0):
 		space='\t'*deepness

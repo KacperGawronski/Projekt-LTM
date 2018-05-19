@@ -67,11 +67,11 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 					tokens.append(Tokenize(formule[i+1:i+jump],notation='classic',target_order=order,order=order))
 					i+=jump
 					continue
-				if formule[i:i+7] in ('\\exists','\\forall'):
+				if  i+7<=l and formule[i:i+7] in ('\\exists','\\forall'):
 					j=i+7
 					lower_jump=find_lower(formule[j:])
 					lower=formule[j:j+lower_jump]
-					print('#',lower,'#')
+					#print('#',lower,'#')
 					jump=classic_notation.find_end_of_token(formule[j+lower_jump:])
 					tokens.append(keywords[formule[i:j]](Tokenize(formule[j+lower_jump:j+lower_jump+jump],notation='classic',target_order=target_order,order='in'),lower=lower,negation=False,target_order=target_order))
 					i+=7+jump+lower_jump
@@ -96,24 +96,24 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 					tokens.append(Predicate(formule[i],formule[i+2:i+jump],negation=False,notation=notation,target_order=target_order))
 					i+=1+jump
 					continue
-				if formule[i:i+4]=='\\neg':
+				if i+4<=l and formule[i:i+4]=='\\neg':
 					jump=classic_notation.find_end_of_token(formule[i+4:])
 					if(formule[i+4] in classic_notation.left_brackets):
-						tokens.append(Tokenize(formule[i+5:i+4+jump],notation,order=order))
+						tokens.append(Tokenize(formule[i+5:i+4+jump],target_order=target_order,notation=notation,order=order))
 					else:
-						tokens.append(Tokenize(formule[i+4:i+4+jump],notation,order=order))
-					print(formule[i:i+4+jump])
+						tokens.append(Tokenize(formule[i+4:i+4+jump],target_order=target_order,notation=notation,order=order))
+					#print(formule[i:i+4+jump])
 					i+=4+jump
 					tokens[-1].change_negation()
 					continue
-				if formule[i:i+5]=='\\land':
+				if i+5<=l and formule[i:i+5]=='\\land':
 					return And(tokens[0],Tokenize(formule[i+5:i+5+classic_notation.find_end_of_token(formule[i+5:])],notation=notation,target_order=target_order,order=order),target_order=target_order,negation=False)
-				if formule[i:i+4]=='\\lor':
-					return Or(tokens[0],Tokenize(formule[i+4:i+4+classic_notation.find_end_of_token(formule[i+4:])],notation,order=order),target_order=target_order,negation=False)
-				if formule[i:i+11]=='\\rightarrow':
-					return Implication(tokens[0],Tokenize(formule[i+11:i+11+classic_notation.find_end_of_token(formule[i+11:])],notation,order=order),target_order=target_order,negation=False)
-				if formule[i:i+15]=='\\leftrightarrow':
-					return Equivalence(tokens[0],Tokenize(formule[i+15:i+15+classic_notation.find_end_of_token(formule[i+15:])],notation,order=order),target_order=target_order,negation=False)
+				if i+4<=l and formule[i:i+4]=='\\lor':
+					return Or(tokens[0],Tokenize(formule[i+4:i+4+classic_notation.find_end_of_token(formule[i+4:])],notation=notation,target_order=target_order,order=order),target_order=target_order,negation=False)
+				if i+11<=l and formule[i:i+11]=='\\rightarrow':
+					return Implication(tokens[0],Tokenize(formule[i+11:i+11+classic_notation.find_end_of_token(formule[i+11:])],notation=notation,target_order=target_order,order=order),target_order=target_order,negation=False)
+				if i+15<=l and formule[i:i+15]=='\\leftrightarrow':
+					return Equivalence(tokens[0],Tokenize(formule[i+15:i+15+classic_notation.find_end_of_token(formule[i+15:])],notation=notation,target_order=target_order,order=order),target_order=target_order,negation=False)
 
 				i+=1
 			if len(tokens)>1:
@@ -121,6 +121,7 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 				return Predicate(''.join(list(map(str,tokens))))
 			return tokens[0]
 	if notation=='Polish':
+		print(formule)
 		if order=='check':
 			order=polish_notation.find_order(formule)
 		if target_order=='check':
@@ -129,16 +130,16 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 		i=0
 		l=len(formule)
 		if l==1:
-			return Variable(formule[i])
+			return Variable(formule[i],target_order=target_order,notation='Polish')
 		if order=='pre':
 			while i<l:
 				if formule[i] in 'ACKE':
 					jump=polish_notation.find_half_of_token(formule)
-					return polish_notation.keywords[formule[i]](Tokenize(formule[i+1:i+jump],notation='Polish',order='pre'),Tokenize(formule[i+jump:],notation='Polish',order='pre'),notation='Polish',target_order=target_order)
+					return polish_notation.keywords[formule[i]](Tokenize(formule[i+1:i+jump],target_order=target_order,notation='Polish',order='pre'),Tokenize(formule[i+jump:],target_order=target_order,notation='Polish',order='pre'),notation='Polish',target_order=target_order)
 				if formule[i] == 'N':
-					return Tokenize(formule[i+1:],notation='Polish',order='pre').change_negation()
+					return Tokenize(formule[i+1:],notation='Polish',order='pre',target_order=target_order).change_negation()
 				if formule[i] in string.ascii_lowercase:
-					return Variable(formule[i])
+					return Variable(formule[i],target_order=target_order,notation='Polish')
 				i+=1
 		if order=='post':
 			return Tokenize(formule[::-1],notation='Polish',order='pre')

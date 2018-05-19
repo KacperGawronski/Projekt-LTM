@@ -30,7 +30,7 @@ def find_half_of_token(formule):
 				stack[-1][1]+=1
 			else:
 				stack[-1][1]+=1
-				while stack[-1][1]==2:
+				while (stack[-1][0] in 'AKCE' and stack[-1][1]==2) or (stack[-1][0]=='N' and stack[-1][1]==1):
 					stack.pop()
 					stack[-1][1]+=1
 		i+=1

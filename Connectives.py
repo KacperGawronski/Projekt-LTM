@@ -1,5 +1,6 @@
 from Token import Token
 from dictionary import notation
+
 class Connective(Token):
 	def __init__ (self,token_a,token_b,target_order,negation=False,notation='classic'):
 		Token.__init__(self,notation)
@@ -48,7 +49,7 @@ class Connective(Token):
 			values_pairs[i]=bool(input(i+': '))
 		self.content_a.set_values(values_pairs)
 		self.content_b.set_values(values_pairs)
-		
+
 class And(Connective):
 	def describe(self,deepness=0):
 		space='\t'*deepness

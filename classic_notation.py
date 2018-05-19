@@ -8,7 +8,7 @@ def check_order(formule):
 		if formule[i] in string.ascii_letters:
 			break	
 		if formule[i]=='\\':
-			if formule[i:i+7]=='\\exists' or formule[i:i+7]=='\\forall':
+			if i+7<=l and (formule[i:i+7]=='\\exists' or formule[i:i+7]=='\\forall'):
 				i+=7
 				if formule[i]=='{':
 					while formule[i]!='}':
@@ -19,10 +19,10 @@ def check_order(formule):
 						i+=1
 					i+=1
 				continue
-			if formule[i:i+4]=='\\neg':
+			if i+4<=l and formule[i:i+4]=='\\neg':
 				i+=4
 				continue
-			if formule[i:i+4]=='\\lor' or formule[i:i+5]=='\\land' or formule[i:i+11]=='\\rightarrow' or formule[i:i+15]=='\\leftrightarrow':
+			if (i+4<=l and formule[i:i+4]=='\\lor') or (i+5<=l and formule[i:i+5]=='\\land') or (i+11<=l and formule[i:i+11]=='\\rightarrow') or (i+15<=l and formule[i:i+15]=='\\leftrightarrow'):
 				order='pre'
 				break
 		i+=1
@@ -37,22 +37,22 @@ def check_order(formule):
 					i-=1
 				i-=2
 				continue
-			if formule[i-6]=='\\' and formule[i-6:i+1]=='\\exists' or formule[i-6:i+1]=='\\forall':
+			if i-6>=0 and ( formule[i-6]=='\\' and (formule[i-6:i+1]=='\\exists' or formule[i-6:i+1]=='\\forall')):
 				i-=7
 				continue
-			if formule[i-3]=='\\' and formule[i-3:i+1]=='\\lor' :
+			if i-3>=0 and ( formule[i-3]=='\\' and formule[i-3:i+1]=='\\lor' ):
 				order='post'
 				break
-			if formule[i-4]=='\\' and formule[i-4:i+1]=='\\land':
+			if i-4>=0 and ( formule[i-4]=='\\' and formule[i-4:i+1]=='\\land'):
 				order='post'
 				break
-			if formule[i-10]=='\\' and formule[i-10:i+1]=='\\rightarrow':
+			if i-10>=0 and ( formule[i-10]=='\\' and formule[i-10:i+1]=='\\rightarrow'):
 				order='post'
 				break
-			if formule[i-14]=='\\' and formule[i-14:i+1]=='\\leftrightarrow':
+			if i-14>=0 and (formule[i-14]=='\\' and formule[i-14:i+1]=='\\leftrightarrow'):
 				order='post'
 				break
-			if formule[i-3]=='\\' and formule[i-3:i+1]=='\\neg':
+			if i-3>=0 and ( formule[i-3]=='\\' and formule[i-3:i+1]=='\\neg'):
 				order='post'
 				break
 			if formule[i] in string.ascii_letters:
@@ -61,7 +61,6 @@ def check_order(formule):
 		if order=='check':
 			order='in'
 			
-	print(order)
 	return order
 
 

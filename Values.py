@@ -31,7 +31,7 @@ class Variable(Token):
 class Predicate(Token):
 	def describe(self,deepness=0):
 		space='\t'*deepness
-		return '{}Predicate: {}\n{}Contains: {}\n{}Variables: {}\n{}Constants: {}\n{}Relations: {}\n{}Negation: {}\n'.format(space,self.name,space,self.formule,space,' '.join(self.variables),space,' '.join(self.constants),space,' '.join(self.relations),space,self.negation)
+		return '{}Predicate: {}\n{}Contains: {}\n{}Variables: {}\n{}Constants: {}\n{}Relations: {}\n{}Negation: {}\n{}Value:{}\n'.format(space,self.name,space,self.formule,space,' '.join(self.variables),space,' '.join(self.constants),space,' '.join(self.relations),space,self.negation,space,self.value)
 	def __init__(self,name,formule,target_order='in',negation=False,notation='classic',value=False):
 		Token.__init__(self,notation)
 		self.name=name
@@ -76,8 +76,10 @@ class Predicate(Token):
 	def neg(self,deepness=0):
 			return Predicate(self.name,self.formule,target_order=self.target_order,negation=not self.negation,notation=self.notation,function=self.function)
 	def get_value(self):
-		print(self.__repr__())
-		return self.value
+		if self.negation:
+			return not self.value
+		else:
+			return self.value
 	def eliminate_ie(self):
 		return self.copy()
 	def copy(self):

@@ -50,6 +50,18 @@ Variables or Predicates in formule.
 .set_values(values_pairs): allow to set values of Variables and
 Predicates from name:value pairs. In case of Predicates name is full
 string describing predicate, for example: P(x)
+
+.find_valuation(): returns list of valuations with resulting boolean
+value of formule when values are applied
+
+.print_ascii_valuation_table(): print possible valuations for given
+formule
+
+.cnf(): returns string of equivalent formule to Token in 
+conjunctive normal form
+
+.dnf(): returns string of equivalent formule to Token in
+dysjunctive normal form (Polish APN)
 '''
 #token=Tokenize('\\neg (p \\leftrightarrow \\exists_{x}(q<129389))','in')	
 #token=Tokenize('(p \\lor q)\\leftrightarrow\\neg(p\\rightarrowq)')
@@ -70,7 +82,7 @@ string describing predicate, for example: P(x)
 #token=Tokenize('\\neg (((\\exists_{x}P(x) \\land q) \\lor \\forall_{y}(P(y) \\land s)) \\leftrightarrow ((p \\leftrightarrow s) \\rightarrow (q \\leftrightarrow r)))')
 #token=Tokenize('\\neg(p \\leftrightarrow q)')
 #token=Tokenize('\\neg(\\exists_{x}(P(x)) \\land \\forall_{y}(R(y)))')
-token=Tokenize('NKKArsEpqECrsAKqrArp')
+#token=Tokenize('NKKArsEpqECrsAKqrArp')
 #token.set_notation('classic')
 #token.set_target_order('in')
 #print(token)
@@ -79,5 +91,10 @@ token=Tokenize('NKKArsEpqECrsAKqrArp')
 #print(token.get_variables())
 #print(token.get_tree())
 #print(token.total_process_negation())
-token.prompt_values()
-print(token.get_value())
+#token.prompt_values()
+#token=Tokenize('\\exists_{x}((P(x))\\lor(\\neg(P(x))))')
+token=Tokenize('NKNApqAKqrKNqNr')
+print(token)
+token.print_ascii_evaluation_table()
+token.set_target_order('pre')
+
