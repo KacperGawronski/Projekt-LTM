@@ -1,9 +1,8 @@
 from Token import Token
 import string
 class Quantifier(Token):
-	def __init__(self,token,lower,order,target_order,negation=False):
+	def __init__(self,token,lower,target_order,negation=False):
 		Token.__init__(self)
-		self.order=order
 		self.target_order=target_order
 		self.lower=lower
 		self.content=token
@@ -34,18 +33,20 @@ class Quantifier(Token):
 	def set_notation(self,variant):
 		self.notation=variant
 		self.content.set_notation(variant)
+		return self
 class Forall(Quantifier):
 	def describe(self,deepness=0):
 		space='\t'*deepness
 		return '{}For all:\n{}Negation: {}\n{}Variables: {}\n{}Affected:\n{}'.format(space,space,self.negation,space,' '.join(self.variables),space,self.content.describe(deepness+1))
-	def __init__(self,token,lower,order,target_order,negation=False):
-		Quantifier.__init__(self,token,lower,target_order,order,negation)
+	def __init__(self,token,lower,target_order,negation=False):
+		Quantifier.__init__(self,token,lower,target_order,negation)
 	def neg(self,deepness=0):
+		self.negation=not self.negation
 		if deepness>0:
 			if self.negation:
-				return Exists(self.content.neg(deepness-1),self.lower,self.order,self.target_order,False)
+				return Exists(self.content.neg(deepness-1),self.lower,self.target_order,False,notation=self.notation,negation=not self.negation)
 			else:
-				return Exists(self.content.neg(deepness-1),self.lower,self.order,self.target_order,True)
+				return Exists(self.content.neg(deepness-1),self.lower,self.target_order,True,notation=self.notation,negation=not self.negation)
 		else:
 			return self
 	def __repr__(self):
@@ -53,18 +54,24 @@ class Forall(Quantifier):
 			return str(self.content)+'\\forall'+self.lower+Token._get_negation_string(self)
 		else:
 			return Token._get_negation_string(self)+'\\forall'+self.lower+' ('+ str(self.content)+')'
+	def process_negation(self):
+		if self.negation:
+			return Exists(self.content.neg(deepness-1),self.lower,self.target_order,False,notation=self.notation,negation=not self.negation)
+		else:
+			return self
 class Exists(Quantifier):
 	def describe(self,deepness=0):
 		space='\t'*deepness
 		return '{}Exists:\n{}Negation: {}\n{}Variables: {}\n{}Affected:\n{}'.format(space,space,self.negation,space,' '.join(self.variables),space,self.content.describe(deepness+1))
-	def __init__(self,token,lower,order,target_order,negation=False):
-		Quantifier.__init__(self,token,lower,target_order,order,negation)
+	def __init__(self,token,lower,target_order,negation=False):
+		Quantifier.__init__(self,token,lower,target_order,negation)
 	def neg(self,deepness=0):
+		self.negation=not self.negation
 		if deepness>0:
 			if self.negation:
-				return Forall(self.content.neg(deepness-1),self.lower,self.order,self.target_order,False)
+				return Forall(self.content.neg(deepness-1),self.lower,self.target_order,False,notation=self.notation,negation=not self.negation)
 			else:
-				return Forall(self.content.neg(deepness-1),self.lower,self.order,self.target_order,True)
+				return Forall(self.content.neg(deepness-1),self.lower,self.target_order,True,notation=self.notation,negation=not self.negation)
 		else:
 			return self
 	def __repr__(self):
@@ -72,3 +79,8 @@ class Exists(Quantifier):
 			return str(self.content)+'\\exists'+self.lower+Token._get_negation_string(self)
 		else:
 			return Token._get_negation_string(self)+'\\exists'+self.lower +' ('+ str(self.content)+')'
+	def process_negation(self):
+		if self.negation:
+			return Forall(self.content.neg(deepness-1),self.lower,self.target_order,False,notation=self.notation,negation=not self.negation)
+		else:
+			return self

@@ -4,8 +4,8 @@ class Variable(Token):
 	def describe(self,deepness=0):
 		space='\t'*deepness
 		return '{}Variable: {}\n{}negation: {}\n'.format(space,self.name,space,self.negation)
-	def __init__(self,name,target_order,negation=False,value=False):
-		Token.__init__(self)
+	def __init__(self,name,target_order='in',negation=False,notation='classic',value=False):
+		Token.__init__(self,notation)
 		self.value=value
 		self.target_order=target_order
 		self.name=name
@@ -17,18 +17,20 @@ class Variable(Token):
 		else:
 			return self.name+Token._get_negation_string(self)
 	def neg(self,deepness=0):
-		if deepness>0:
-			return Variable(self.name,self.target_order,not self.negation)
-		else:
-			return self
+		return Variable(self.name,target_order=self.target_order,negation=not self.negation,notation=self.notation,value=self.value)
 	def get_value(self):
-		return self.value
+		if self.negation:
+			return not self.value
+		else:
+			return self.value
+	def eliminate_ie(self):
+		return Variable(self.name,target_order=self.target_order,negation=self.negation,notation=self.notation,value=self.value)
 class Predicate(Token):
 	def describe(self,deepness=0):
 		space='\t'*deepness
 		return '{}Predicate: {}\n{}Contains: {}\n{}Variables: {}\n{}Constants: {}\n{}Relations: {}\n{}Negation: {}\n'.format(space,self.name,space,self.formule,space,' '.join(self.variables),space,' '.join(self.constants),space,' '.join(self.relations),space,self.negation)
-	def __init__(self,name,formule,target_order,negation=False,function=lambda x:False):
-		Token.__init__(self)
+	def __init__(self,name,formule,target_order='in',negation=False,notation='classic',function=lambda x:False):
+		Token.__init__(self,notation)
 		self.name=name
 		self.formule=formule
 		self.target_order=target_order
@@ -69,9 +71,8 @@ class Predicate(Token):
 		else:
 			return '('+str(self.formule)+')'+self.name+Token._get_negation_string(self)
 	def neg(self,deepness):
-		if deepness>0:
-			return Predicate(self.name,self.formule,self.target_order,not self.negation)
-		else:
-			return self
+			return Predicate(self.name,self.formule,self.target_order,not self.negation,notation=self.notation,function=self.function)
 	def get_value(self):
 		return self.function(self.formule)
+	def eliminate_ie(self):
+		return Predicate(self.name,self.formule,self.target_order,self.negation,notation=self.notation,function=self.function)
