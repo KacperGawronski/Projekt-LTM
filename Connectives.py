@@ -35,12 +35,26 @@ class Connective(Token):
 			return tmp
 		else:
 			return self.copy()
+	def get_variables(self):
+		return self.content_a.get_variables()|self.content_b.get_variables()
+	def get_tree(self):
+		return [self.content_a.get_tree(),self.content_b.get_tree()]
+	def set_values(self,values_pairs):
+		self.content_a.set_values(values_pairs)
+		self.content_b.set_values(values_pairs)
+	def prompt_values(self):
+		values_pairs={}
+		for i in self.get_variables():
+			values_pairs[i]=bool(input(i+': '))
+		self.content_a.set_values(values_pairs)
+		self.content_b.set_values(values_pairs)
+		
 class And(Connective):
 	def describe(self,deepness=0):
 		space='\t'*deepness
 		return '{}And:\n{}Negation {}\n{}\n{}_AND_\n{}\n'.format(space,space,self.negation,self.content_a.describe(deepness+1),space,self.content_b.describe(deepness+1))
 	def __init__(self,token_a,token_b,target_order,negation=False,notation='classic'):
-		Connective.__init__(self,token_a,token_b,target_order,negation,notation)
+		Connective.__init__(self,token_a,token_b,target_order=target_order,negation=negation,notation=notation)
 	def __repr__(self):
 		if self.target_order == "in":
 			return Token._get_negation_string(self)+notation[self.notation]['lbracket']+str(self.content_a) + notation[self.notation]['and'] + str(self.content_b)+notation[self.notation]['rbracket']
@@ -55,22 +69,22 @@ class And(Connective):
 			return And(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation,negation=not self.negation).set_notation(self.notation)
 	def process_negation(self):
 		if self.negation:
-			return Or(self.content_a.neg(1),self.content_b.neg(1),self.target_order,notation=self.notation).set_notation(self.notation)
+			return Or(self.content_a.neg(1),self.content_b.neg(1),self.target_order,notation=self.notation)
 		else:
 			return self.copy()
 	def get_value(self):
 		if self.negation:
-			return not self.content.get_value() or not self.content.get_value()
+			return not self.content_a.get_value() or not self.content_b.get_value()
 		else:	
 			return self.content_a.get_value() and self.content_b.get_value()
 	def copy(self):
-		 return And(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
+		 return And(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation,negation=self.negation)
 class Or(Connective):
 	def describe(self,deepness=0):
 		space='\t'*deepness
 		return '{}Or:\n{}Negation {}\n{}\n{}_OR_\n{}\n'.format(space,space,self.negation,self.content_a.describe(deepness+1),space,self.content_b.describe(deepness+1))
 	def __init__(self,token_a,token_b,target_order,negation=False,notation='classic'):
-		Connective.__init__(self,token_a,token_b,target_order,negation,notation)
+		Connective.__init__(self,token_a,token_b,target_order=target_order,negation=negation,notation=notation)
 	def __repr__(self):
 		if self.target_order == "in":
 			return Token._get_negation_string(self)+notation[self.notation]['lbracket']+str(self.content_a) + notation[self.notation]['or'] + str(self.content_b)+notation[self.notation]['rbracket']
@@ -85,22 +99,22 @@ class Or(Connective):
 			return Or(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation,negation=not self.negation).set_notation(self.notation)
 	def process_negation(self):
 		if self.negation:
-			return And(self.content_a.neg(0),self.content_b.neg(0),self.target_order,notation=self.notation).set_notation(self.notation)
+			return And(self.content_a.neg(0),self.content_b.neg(0),self.target_order,notation=self.notation)
 		else:
 			return self.copy()
 	def get_value(self):
 		if self.negation:
-			return not self.content.get_value() and not self.content.get_value()
+			return not self.content_a.get_value() and not self.content_b.get_value()
 		else:
 			return self.content_a.get_value() or self.content_b.get_value()
 	def copy(self):
-		return Or(self.content_a.neg(0),self.content_b.neg(0),self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
+		return Or(self.content_a.neg(0),self.content_b.neg(0),self.target_order,notation=self.notation,negation=self.negation)
 class Implication(Connective):
 	def describe(self,deepness=0):
 		space='\t'*deepness
 		return '{}Implication:\n{}negation: {}\n{}{}\n=>\n{}\n'.format(space,space,self.negation,space,self.content_a.describe(deepness+1),self.content_b.describe(deepness+1))
 	def __init__(self,token_a,token_b,target_order,negation=False,notation='classic'):
-		Connective.__init__(self,token_a,token_b,target_order,negation,notation)
+		Connective.__init__(self,token_a,token_b,target_order=target_order,negation=negation,notation=notation)
 	def __repr__(self):
 		if self.target_order == "in":
 			return Token._get_negation_string(self)+notation[self.notation]['lbracket']+str(self.content_a) + notation[self.notation]['implication'] + str(self.content_b)+notation[self.notation]['rbracket']
@@ -115,7 +129,7 @@ class Implication(Connective):
 			return Implication(self.content_a,self.content_b,target_order=self.target_order,negation=not self.negation,notation=self.notation)
 	def process_negation(self):
 		if self.negation:
-			return And(self.content_a.neg(0),self.content_b.neg(0),self.target_order,notation=self.notation).set_notation(self.notation)
+			return And(self.content_a.neg(0),self.content_b.neg(0),self.target_order,notation=self.notation)
 		else:
 			return self.copy()
 		
@@ -133,7 +147,7 @@ class Equivalence(Connective):
 		space='\t'*deepness
 		return '{}Equivalence:\n{}negation: {}\n{}\n{}<=>\n{}\n'.format(space,space,self.negation,self.content_a.describe(deepness+1),space,self.content_b.describe(deepness+1))
 	def __init__(self,token_a,token_b,target_order,negation=False,notation='classic'):
-		Connective.__init__(self,token_a,token_b,target_order,negation,notation)
+		Connective.__init__(self,token_a,token_b,target_order=target_order,negation=negation,notation=notation)
 	def __repr__(self):
 		if self.target_order == "in":
 			return Token._get_negation_string(self)+notation[self.notation]['lbracket']+str(self.content_a) + notation[self.notation]['equivalence'] + str(self.content_b)+notation[self.notation]['rbracket']
@@ -148,7 +162,7 @@ class Equivalence(Connective):
 			return Equivalence(self.content_a,self.content_b,target_order=self.target_order,negation=not self.negation,notation=self.notation)
 	def process_negation(self):
 		if self.negation:
-			return Or(Implication(self.content_a,self.content_b,self.target_order,notation=self.notation).neg(1),Implication(self.content_b,self.content_a,self.target_order,notation=self.notation).neg(1),self.target_order,notation=self.notation).set_notation(self.notation)
+			return Or(Implication(self.content_a,self.content_b,self.target_order,notation=self.notation).neg(1),Implication(self.content_b,self.content_a,self.target_order,notation=self.notation).neg(1),self.target_order,notation=self.notation)
 		else:
 			return self.copy() 
 	def eliminate_ie(self):

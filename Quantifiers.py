@@ -48,6 +48,17 @@ class Quantifier(Token):
 		if tmp.content.quantifiers_below():
 			tmp.content=tmp.content.remove_negation_from_before_quantifiers()
 		return tmp
+	def get_variables(self):
+		return self.content.get_variables()
+	def get_tree(self):
+		return [self.content.get_tree()]
+	def set_values(self,values_pairs):
+		self.content.set_values(values_pairs)
+	def prompt_values(self):
+		values_pairs={}
+		for i in self.get_variables():
+			values_pairs[i]=bool(input(i+': '))
+		self.content.set_values(values_pairs)
 class Forall(Quantifier):
 	def describe(self,deepness=0):
 		space='\t'*deepness

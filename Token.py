@@ -1,4 +1,7 @@
 from dictionary import notation
+
+
+
 class Token:
 	def __init__(self,variant='classic'):
 		self.notation=variant
@@ -25,3 +28,13 @@ class Token:
 		return False
 	def remove_negation_from_before_quantifiers(self):
 		return self.process_negation()
+	def ref_object(self):
+		return self
+	def get_variables(self):
+		return set([self.name])
+	def get_tree(self):
+		return self
+	def set_values(self,values_pairs):
+		self.value=values_pairs[self.name]
+	def prompt_values(self):
+		self.value=bool(input(self.name+':'))
