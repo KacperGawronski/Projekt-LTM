@@ -38,7 +38,7 @@ class And(Connective):
 		if deepness>0:
 			return Or(self.content_a.neg(deepness-1),self.content_b.neg(deepness-1),self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
 		else:
-			return And(self.content_a,self.content_b,self.target_order,notation=self.notation,negation=not self.negation).set_notation(self.notation)
+			return And(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation,negation=not self.negation).set_notation(self.notation)
 	def process_negation(self):
 		if self.negation:
 			return Or(self.content_a.neg(1),self.content_b.neg(1),self.target_order,notation=self.notation).set_notation(self.notation)
@@ -64,9 +64,9 @@ class Or(Connective):
 			return notation[self.notation]['lbracket']+str(self.content_b)+str(self.content_a)+notation[self.notation]['rbracket'] + notation[self.notation]['or']+Token._get_negation_string(self)
 	def neg(self,deepness=0):
 		if deepness>0:
-			return And(self.content_a.neg(deepness-1),self.content_b.neg(deepness-1),self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
+			return And(self.content_a.neg(deepness-1),self.content_b.neg(deepness-1),target_order=self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
 		else:
-			return Or(self.content_a,self.content_b,self.target_order,notation=self.notation,negation=not self.negation).set_notation(self.notation)
+			return Or(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation,negation=not self.negation).set_notation(self.notation)
 	def process_negation(self):
 		if self.negation:
 			return And(self.content_a.neg(1),self.content_b.neg(1),self.target_order,notation=self.notation).set_notation(self.notation)
@@ -93,9 +93,9 @@ class Implication(Connective):
 			return notation[self.notation]['lbracket']+str(self.content_b)+str(self.content_a)+notation[self.notation]['rbracket'] +notation[self.notation]['implication'] + Token._get_negation_string(self)
 	def neg(self,deepness=0):
 		if deepness>0:
-			return And(self.content_a.neg(deepness-1),self.content_b.neg(deepness-1),self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
+			return And(self.content_a.neg(deepness-1),self.content_b.neg(deepness-1),target_order=self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
 		else:
-			return Implication(self.content_a,self.content_b,target_order=target_order,negation=not self.negation,notation=self.notation)
+			return Implication(self.content_a,self.content_b,target_order=self.target_order,negation=not self.negation,notation=self.notation)
 	def process_negation(self):
 		if self.negation:
 			return And(self.content_a.neg(0),self.content_b.neg(0),self.target_order,notation=self.notation).set_notation(self.notation)
@@ -112,7 +112,8 @@ class Implication(Connective):
 
 class Equivalence(Connective):
 	def describe(self,deepness=0):
-		return 'Equivalence:\n\tnegation: {}\n\t {}\n<=>\n{}\n'.format(self.negation,self.content_a.describe(deepness+1),self.content_b.describe(deepness+1))
+		space='\t'*deepness
+		return '{}Equivalence:\n{}negation: {}\n{}\n{}<=>\n{}\n'.format(space,space,self.negation,self.content_a.describe(deepness+1),space,self.content_b.describe(deepness+1))
 	def __init__(self,token_a,token_b,target_order,negation=False,notation='classic'):
 		Connective.__init__(self,token_a,token_b,target_order,negation,notation)
 	def __repr__(self):
@@ -124,16 +125,16 @@ class Equivalence(Connective):
 			return notation[self.notation]['lbracket']+str(self.content_b)+str(self.content_a)+notation[self.notation]['rbracket'] +notation[self.notation]['equivalence']+Token._get_negation_string(self)
 	def neg(self,deepness=0):
 		if deepness>0:
-			return Or(Implication(self.content_a,self.content_b,self.target_order,notation=self.notation).neg(deepness-1),Implication(self.content_b,self.content_a,self.target_order,notation=self.notation).neg(deepness-1),self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
+			return Or(Implication(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation).neg(deepness-1),Implication(self.content_b,self.content_a,target_order=self.target_order,notation=self.notation).neg(deepness-1),target_order=self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
 		else:
-			return Equivalence(self.content_a,self.content_b,target_order=target_order,negation=not self.negation,notation=self.notation)
+			return Equivalence(self.content_a,self.content_b,target_order=self.target_order,negation=not self.negation,notation=self.notation)
 	def process_negation(self):
 		if self.negation:
 			return Or(Implication(self.content_a,self.content_b,self.target_order,notation=self.notation).neg(1),Implication(self.content_b,self.content_a,self.target_order,notation=self.notation).neg(1),self.target_order,notation=self.notation).set_notation(self.notation)
 		else:
 			return self
 	def eliminate_ie(self):
-		return And(Implication(self.content_a,self.content_b,self.target_order,notation=self.notation).eliminate_ie(),Implication(self.content_b,self.content_a,self.target_order,notation=self.notation).eliminate_ie(),self.target_order,self.negation).eliminate_ie().set_notation(self.notation)
+		return And(Implication(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation).eliminate_ie(),Implication(self.content_b,self.content_a,target_order=self.target_order,notation=self.notation).eliminate_ie(),target_order=self.target_order,negation=self.negation).eliminate_ie().set_notation(self.notation)
 	def get_value(self):
 		if self.negation:
 			return (self.content_a.get_value() or self.content_b.get_value()) and (not self.content_a.get_value() or not self.content_b.get_value())

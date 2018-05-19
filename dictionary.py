@@ -6,8 +6,8 @@ notation={
 		'or':' \\lor ',
 		'implication':' \\rightarrow ',
 		'equivalence':' \\leftrightarrow ',
-		'lbracket':' \\left( ',
-		'rbracket':' \\right) '
+		'lbracket':'(',#' \\left( ',
+		'rbracket':')'#' \\right) '
 	},
 	'Polish':{
 		'lbracket':'',

@@ -16,7 +16,6 @@ keywords={
 	'\\leftrightarrow':Equivalence
 	}
 
-
 def find_lower(formule):
 	i=0
 	l=len(formule)
@@ -48,6 +47,7 @@ def find_notation(formule):
 	else:
 		return 'Polish'
 def Tokenize(formule,notation='check',target_order='check',order='check'):
+	print(formule)
 	formule=formule.replace(' ','').replace('\t','').replace('\n','')
 	if notation=='check':
 		notation=find_notation(formule)
@@ -63,10 +63,9 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 		if order=='in':
 			i=0
 			while i<l:
-				print(formule[i:])
-				if formule[i] in left_brackets:
+				if formule[i] in classic_notation.left_brackets:
 					jump=classic_notation.find_closing_bracket(formule[i:])
-					tokens.append(Tokenize(formule[i+1:i+jump],notation,target_order,order=order))
+					tokens.append(Tokenize(formule[i+1:i+jump],notation='classic',target_order=order,order=order))
 					i+=jump
 					continue
 				if formule[i:i+7] in ('\\exists','\\forall'):
@@ -77,13 +76,13 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 					tokens.append(keywords[formule[i:j]](Tokenize(formule[j+lower_jump:j+lower_jump+jump]),lower,order,target_order))
 					i+=7+jump+lower_jump
 					continue
-				if formule[i] in string.ascii_lowercase or formule[i] in string.digits or check_relational_symbols(formule[i:]):
+				if formule[i] in string.ascii_lowercase or formule[i] in string.digits or classic_notation.check_relational_symbols(formule[i:]):
 					#<TODO> ROZSZERZYĆ O INNE SYMBOLE RELACYJNE
 					start=i
 					if l>1:
 						while (i<l-1 and formule[i+1] in string.digits) or (i<l and formule[i] in string.digits):
 							i+=1
-						while i<l and (formule[i] in string.digits or check_relational_symbols(formule[i:])):
+						while i<l and (formule[i] in string.digits or classic_notation.check_relational_symbols(formule[i:])):
 							i+=skip_digits(formule[i:])
 							i+=1
 					if start!=i:
@@ -107,16 +106,17 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 					tokens[-1].change_negation()
 					continue
 				if formule[i:i+5]=='\\land':
-					return And(tokens[0],Tokenize(formule[i+5:i+5+find_end_of_token(formule[i+5:])],notation,order=order),'in',target_order)
+					return And(tokens[0],Tokenize(formule[i+5:i+5+classic_notation.find_end_of_token(formule[i+5:])],notation=notation,target_order=target_order,order=order),target_order=target_order,negation=False)
 				if formule[i:i+4]=='\\lor':
-					return Or(tokens[0],Tokenize(formule[i+4:i+4+find_end_of_token(formule[i+4:])],notation,order=order),'in',target_order)
+					return Or(tokens[0],Tokenize(formule[i+4:i+4+classic_notation.find_end_of_token(formule[i+4:])],notation,order=order),target_order=target_order,negation=False)
 				if formule[i:i+11]=='\\rightarrow':
-					return Implication(tokens[0],Tokenize(formule[i+11:i+11+find_end_of_token(formule[i+11:])],notation,order=order),'in',target_order)
+					return Implication(tokens[0],Tokenize(formule[i+11:i+11+classic_notation.find_end_of_token(formule[i+11:])],notation,order=order),target_order=target_order,negation=False)
 				if formule[i:i+15]=='\\leftrightarrow':
-					return Equivalence(tokens[0],Tokenize(formule[i+15:i+15+find_end_of_token(formule[i+15:])],notation,order=order),'in',target_order)
+					return Equivalence(tokens[0],Tokenize(formule[i+15:i+15+classic_notation.find_end_of_token(formule[i+15:])],notation,order=order),target_order=target_order,negation=False)
 
 				i+=1
 			if len(tokens)>1:
+				print(tokens)
 				return Predicate(''.join(list(map(str,tokens))))
 			return tokens[0]
 	if notation=='Polish':

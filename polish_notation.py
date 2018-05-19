@@ -22,7 +22,6 @@ def find_half_of_token(formule):
 	i=0
 	stack=[]
 	while i<l:
-		print(stack)
 		if formule[i] in 'AKCEN':
 			stack.append([formule[i],0])
 		else:
