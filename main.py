@@ -1,6 +1,56 @@
 from Tokens import *
 
+'''
+Main function to process formule either in Polish notation,
+reversed Polish notation or classic infix notation using LaTeX
+is function Tokenize.
+It parses string, creates token from it - either Variable, Predicate,
+Connective or Quantifier. It recursively process string, and creates
+tokens deeper and deeper, each of them is contained in parent -
+Connective or Quantifier.
+Negation is implemented as negation boolean value in Token.
+Token created by Tokenize function have methods:
 
+.copy(): returns copy of self
+
+.change_negation(): set current negation to it's opposite. Returns self.
+
+.process_negation(): if possible, removes negation from before
+Connective or Quantifier. Returns processed result or self.copy()
+
+.total_process_negation(): calls process_negation() in current object
+and recursively in all contained objects. Stops at Variable or
+Predicate. Returns result of such process.
+
+.remove_negation_from_before_quantifiers(): process negations
+recursively only if there is quantifier in children. Returns result or
+self.copy()
+
+.neg(deepness=0): returns negated variable (deepness allow to process
+and negate object, it's children, children's children and so). 
+Returns copy of Token with negated value.
+
+.eliminate_ie(): alters Implications and Equivalences to equivalent 
+formules using Conjugations and Alternatives.
+
+.set_target_order(variant): allows to switch between
+'in'-,'pre'-,'post'- -fix notations
+
+.set_notation(variant): allows to switch between 'Polish' and 'classic'
+notations.
+
+.get_variables():returns set of Variables or Predicates located in
+formule
+
+.get_tree(): returns tree as list of lists showing placement of
+Variables or Predicates in formule.
+
+.describe(): returns string describing each Token in formule
+
+.set_values(values_pairs): allow to set values of Variables and
+Predicates from name:value pairs. In case of Predicates name is full
+string describing predicate, for example: P(x)
+'''
 #token=Tokenize('\\neg (p \\leftrightarrow \\exists_{x}(q<129389))','in')	
 #token=Tokenize('(p \\lor q)\\leftrightarrow\\neg(p\\rightarrowq)')
 #token.set_notation('Polish')

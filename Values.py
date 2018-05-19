@@ -82,3 +82,10 @@ class Predicate(Token):
 		return self.copy()
 	def copy(self):
 		return Predicate(self.name,self.formule,target_order=self.target_order,negation=self.negation,notation=self.notation,function=self.function)
+
+	def get_variables(self):
+		return set([self.name+'('+self.formule+')'])
+	def set_values(self,values_pairs):
+		self.value=values_pairs[self.name+'('+self.formule+')']
+	def prompt_values(self):
+		self.value=bool(input(self.name+'('+self.formule+'):'))

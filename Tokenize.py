@@ -47,7 +47,6 @@ def find_notation(formule):
 	else:
 		return 'Polish'
 def Tokenize(formule,notation='check',target_order='check',order='check'):
-	print(formule)
 	formule=formule.replace(' ','').replace('\t','').replace('\n','')
 	if notation=='check':
 		notation=find_notation(formule)
@@ -118,7 +117,7 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 
 				i+=1
 			if len(tokens)>1:
-				print(tokens)
+				print('Tokens converted to predicate: ',tokens)
 				return Predicate(''.join(list(map(str,tokens))))
 			return tokens[0]
 	if notation=='Polish':
@@ -130,18 +129,15 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 		i=0
 		l=len(formule)
 		if l==1:
-			print('#',formule[i])
 			return Variable(formule[i])
 		if order=='pre':
 			while i<l:
 				if formule[i] in 'ACKE':
 					jump=polish_notation.find_half_of_token(formule)
-					print(formule[i],formule[i+1:i+jump],formule[i+jump:])
 					return polish_notation.keywords[formule[i]](Tokenize(formule[i+1:i+jump],notation='Polish',order='pre'),Tokenize(formule[i+jump:],notation='Polish',order='pre'),notation='Polish',target_order=target_order)
 				if formule[i] == 'N':
 					return Tokenize(formule[i+1:],notation='Polish',order='pre').change_negation()
 				if formule[i] in string.ascii_lowercase:
-					print('#',formule[i])
 					return Variable(formule[i])
 				i+=1
 		if order=='post':
