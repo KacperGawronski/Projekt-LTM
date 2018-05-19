@@ -20,7 +20,21 @@ class Connective(Token):
 		self.content_a.set_notation(variant)
 		self.content_b.set_notation(variant)
 		return self
-		
+	def total_process_negation(self):
+		tmp=self.process_negation()
+		tmp.content_a=tmp.content_a.total_process_negation()
+		tmp.content_b=tmp.content_b.total_process_negation()
+		return tmp
+	def quantifiers_below(self):
+		return self.content_a.quantifiers_below() or self.content_b.quantifiers_below()
+	def remove_negation_from_before_quantifiers(self):
+		if self.quantifiers_below():
+			tmp=self.process_negation()
+			tmp.content_a=tmp.content_a.remove_negation_from_before_quantifiers()
+			tmp.content_b=tmp.content_b.remove_negation_from_before_quantifiers()
+			return tmp
+		else:
+			return self.copy()
 class And(Connective):
 	def describe(self,deepness=0):
 		space='\t'*deepness
@@ -43,12 +57,14 @@ class And(Connective):
 		if self.negation:
 			return Or(self.content_a.neg(1),self.content_b.neg(1),self.target_order,notation=self.notation).set_notation(self.notation)
 		else:
-			return self
+			return self.copy()
 	def get_value(self):
 		if self.negation:
 			return not self.content.get_value() or not self.content.get_value()
 		else:	
 			return self.content_a.get_value() and self.content_b.get_value()
+	def copy(self):
+		 return And(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
 class Or(Connective):
 	def describe(self,deepness=0):
 		space='\t'*deepness
@@ -69,15 +85,16 @@ class Or(Connective):
 			return Or(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation,negation=not self.negation).set_notation(self.notation)
 	def process_negation(self):
 		if self.negation:
-			return And(self.content_a.neg(1),self.content_b.neg(1),self.target_order,notation=self.notation).set_notation(self.notation)
+			return And(self.content_a.neg(0),self.content_b.neg(0),self.target_order,notation=self.notation).set_notation(self.notation)
 		else:
-			return self
+			return self.copy()
 	def get_value(self):
 		if self.negation:
 			return not self.content.get_value() and not self.content.get_value()
 		else:
 			return self.content_a.get_value() or self.content_b.get_value()
-
+	def copy(self):
+		return Or(self.content_a.neg(0),self.content_b.neg(0),self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
 class Implication(Connective):
 	def describe(self,deepness=0):
 		space='\t'*deepness
@@ -100,7 +117,7 @@ class Implication(Connective):
 		if self.negation:
 			return And(self.content_a.neg(0),self.content_b.neg(0),self.target_order,notation=self.notation).set_notation(self.notation)
 		else:
-			return self
+			return self.copy()
 		
 	def eliminate_ie(self):
 		return Or(self.content_a.neg(0),self.content_b,self.target_order,negation=self.negation,notation=self.notation).eliminate_ie()
@@ -109,7 +126,8 @@ class Implication(Connective):
 			return self.content_a.get_value and not self.content_b.get_value()
 		else:
 			return not self.content_a.get_value or self.content_b.get_value()
-
+	def copy(self):
+		return Implication(self.content_a,self.content_b,target_order=self.target_order,negation=self.negation,notation=self.notation)
 class Equivalence(Connective):
 	def describe(self,deepness=0):
 		space='\t'*deepness
@@ -132,7 +150,7 @@ class Equivalence(Connective):
 		if self.negation:
 			return Or(Implication(self.content_a,self.content_b,self.target_order,notation=self.notation).neg(1),Implication(self.content_b,self.content_a,self.target_order,notation=self.notation).neg(1),self.target_order,notation=self.notation).set_notation(self.notation)
 		else:
-			return self
+			return self.copy() 
 	def eliminate_ie(self):
 		return And(Implication(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation).eliminate_ie(),Implication(self.content_b,self.content_a,target_order=self.target_order,notation=self.notation).eliminate_ie(),target_order=self.target_order,negation=self.negation).eliminate_ie().set_notation(self.notation)
 	def get_value(self):
@@ -140,3 +158,6 @@ class Equivalence(Connective):
 			return (self.content_a.get_value() or self.content_b.get_value()) and (not self.content_a.get_value() or not self.content_b.get_value())
 		else:
 			return (self.content_a.get_value() and self.content_b.get_value()) or (not self.content_a.get_value() and not self.content_b.get_value())
+	def copy(self):
+		return Equivalence(self.content_a,self.content_b,target_order=self.target_order,negation=self.negation,notation=self.notation)
+	

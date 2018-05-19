@@ -24,7 +24,10 @@ class Variable(Token):
 		else:
 			return self.value
 	def eliminate_ie(self):
+		return self.copy()
+	def copy(self):
 		return Variable(self.name,target_order=self.target_order,negation=self.negation,notation=self.notation,value=self.value)
+	
 class Predicate(Token):
 	def describe(self,deepness=0):
 		space='\t'*deepness
@@ -34,7 +37,7 @@ class Predicate(Token):
 		self.name=name
 		self.formule=formule
 		self.target_order=target_order
-		self.negation=False
+		self.negation=negation
 		self.function=function
 		self.constants=[]
 		self.variables=[]
@@ -70,9 +73,12 @@ class Predicate(Token):
 			return Token._get_negation_string(self)+self.name+'('+str(self.formule)+')'
 		else:
 			return '('+str(self.formule)+')'+self.name+Token._get_negation_string(self)
-	def neg(self,deepness):
-			return Predicate(self.name,self.formule,self.target_order,not self.negation,notation=self.notation,function=self.function)
+	def neg(self,deepness=0):
+			return Predicate(self.name,self.formule,target_order=self.target_order,negation=not self.negation,notation=self.notation,function=self.function)
 	def get_value(self):
+		print(self.__repr__())
 		return self.function(self.formule)
 	def eliminate_ie(self):
-		return Predicate(self.name,self.formule,self.target_order,self.negation,notation=self.notation,function=self.function)
+		return self.copy()
+	def copy(self):
+		return Predicate(self.name,self.formule,target_order=self.target_order,negation=self.negation,notation=self.notation,function=self.function)

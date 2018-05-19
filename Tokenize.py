@@ -72,8 +72,9 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 					j=i+7
 					lower_jump=find_lower(formule[j:])
 					lower=formule[j:j+lower_jump]
+					print('#',lower,'#')
 					jump=classic_notation.find_end_of_token(formule[j+lower_jump:])
-					tokens.append(keywords[formule[i:j]](Tokenize(formule[j+lower_jump:j+lower_jump+jump]),lower,order,target_order))
+					tokens.append(keywords[formule[i:j]](Tokenize(formule[j+lower_jump:j+lower_jump+jump],notation='classic',target_order=target_order,order='in'),lower=lower,negation=False,target_order=target_order))
 					i+=7+jump+lower_jump
 					continue
 				if formule[i] in string.ascii_lowercase or formule[i] in string.digits or classic_notation.check_relational_symbols(formule[i:]):
@@ -92,16 +93,17 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 					i+=1
 					continue
 				if formule[i] in string.ascii_uppercase:
-					jump=find_closing_bracket(formule[i+1:])
-					tokens.append(Predicate(formule[i],formule[i+2:i+jump],target_order))
+					jump=classic_notation.find_closing_bracket(formule[i+1:])
+					tokens.append(Predicate(formule[i],formule[i+2:i+jump],negation=False,notation=notation,target_order=target_order))
 					i+=1+jump
 					continue
 				if formule[i:i+4]=='\\neg':
-					jump=find_end_of_token(formule[i+4:])
-					if(formule[i+4] in left_brackets):
+					jump=classic_notation.find_end_of_token(formule[i+4:])
+					if(formule[i+4] in classic_notation.left_brackets):
 						tokens.append(Tokenize(formule[i+5:i+4+jump],notation,order=order))
 					else:
 						tokens.append(Tokenize(formule[i+4:i+4+jump],notation,order=order))
+					print(formule[i:i+4+jump])
 					i+=4+jump
 					tokens[-1].change_negation()
 					continue
