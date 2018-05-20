@@ -62,7 +62,7 @@ class And(Connective):
 		if self.target_order == "pre":
 			return Token._get_negation_string(self)+notation[self.notation]['and'] +notation[self.notation]['lbracket']+ str(self.content_a)+str(self.content_b)+notation[self.notation]['rbracket']	
 		if self.target_order == "post":
-			return notation[self.notation]['lbracket']+str(self.content_b)+str(self.content_a) +notation[self.notation]['rbracket']+notation[self.notation]['and'] + Token._get_negation_string(self)
+			return notation[self.notation]['lbracket']+str(self.content_a)+str(self.content_b) +notation[self.notation]['rbracket']+notation[self.notation]['and'] + Token._get_negation_string(self)
 	def neg(self,deepness=0):
 		if deepness>0:
 			return Or(self.content_a.neg(deepness-1),self.content_b.neg(deepness-1),self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
@@ -92,7 +92,7 @@ class Or(Connective):
 		if self.target_order == "pre":
 			return Token._get_negation_string(self)+notation[self.notation]['or'] +notation[self.notation]['lbracket']+ str(self.content_a)+str(self.content_b)+notation[self.notation]['rbracket']
 		if self.target_order == "post":
-			return notation[self.notation]['lbracket']+str(self.content_b)+str(self.content_a)+notation[self.notation]['rbracket'] + notation[self.notation]['or']+Token._get_negation_string(self)
+			return notation[self.notation]['lbracket']+str(self.content_a)+str(self.content_b)+notation[self.notation]['rbracket'] + notation[self.notation]['or']+Token._get_negation_string(self)
 	def neg(self,deepness=0):
 		if deepness>0:
 			return And(self.content_a.neg(deepness-1),self.content_b.neg(deepness-1),target_order=self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
@@ -122,7 +122,7 @@ class Implication(Connective):
 		if self.target_order == "pre":
 			return Token._get_negation_string(self)+notation[self.notation]['implication'] +notation[self.notation]['lbracket']+ str(self.content_a)+str(self.content_b)+notation[self.notation]['rbracket']
 		if self.target_order == "post":
-			return notation[self.notation]['lbracket']+str(self.content_b)+str(self.content_a)+notation[self.notation]['rbracket'] +notation[self.notation]['implication'] + Token._get_negation_string(self)
+			return notation[self.notation]['lbracket']+str(self.content_a)+str(self.content_b)+notation[self.notation]['rbracket'] +notation[self.notation]['implication'] + Token._get_negation_string(self)
 	def neg(self,deepness=0):
 		if deepness>0:
 			return And(self.content_a.neg(deepness-1),self.content_b.neg(deepness-1),target_order=self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)
@@ -155,7 +155,7 @@ class Equivalence(Connective):
 		if self.target_order == "pre":
 			return Token._get_negation_string(self)+notation[self.notation]['equivalence'] + notation[self.notation]['lbracket']+str(self.content_a)+str(self.content_b)+notation[self.notation]['rbracket']	
 		if self.target_order == "post":
-			return notation[self.notation]['lbracket']+str(self.content_b)+str(self.content_a)+notation[self.notation]['rbracket'] +notation[self.notation]['equivalence']+Token._get_negation_string(self)
+			return notation[self.notation]['lbracket']+str(self.content_a)+str(self.content_b)+notation[self.notation]['rbracket'] +notation[self.notation]['equivalence']+Token._get_negation_string(self)
 	def neg(self,deepness=0):
 		if deepness>0:
 			return Or(Implication(self.content_a,self.content_b,target_order=self.target_order,notation=self.notation).neg(deepness-1),Implication(self.content_b,self.content_a,target_order=self.target_order,notation=self.notation).neg(deepness-1),target_order=self.target_order,notation=self.notation,negation=self.negation).set_notation(self.notation)

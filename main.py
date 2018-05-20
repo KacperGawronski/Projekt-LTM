@@ -97,4 +97,3 @@ token=Tokenize('NKNApqAKqrKNqNr')
 print(token)
 token.print_ascii_evaluation_table()
 token.set_target_order('pre')
-
