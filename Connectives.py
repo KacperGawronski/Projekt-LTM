@@ -140,7 +140,8 @@ class Implication(Connective):
 		if self.negation:
 			return self.content_a.get_value and not self.content_b.get_value()
 		else:
-			return not self.content_a.get_value or self.content_b.get_value()
+			print(self.content_a.get_value(),self.content_b.get_value())
+			return not self.content_a.get_value() or self.content_b.get_value()
 	def copy(self):
 		return Implication(self.content_a,self.content_b,target_order=self.target_order,negation=self.negation,notation=self.notation)
 class Equivalence(Connective):

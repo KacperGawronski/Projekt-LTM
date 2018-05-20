@@ -127,11 +127,11 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 		if target_order=='check':
 			target_order=order
 		stack=[]
-		i=0
 		l=len(formule)
 		if l==1:
-			return Variable(formule[i],target_order=target_order,notation='Polish')
+			return Variable(formule[0],target_order=target_order,notation='Polish')
 		if order=='pre':
+			i=0
 			while i<l:
 				if formule[i] in 'ACKE':
 					jump=polish_notation.find_half_of_token(formule)
@@ -142,5 +142,15 @@ def Tokenize(formule,notation='check',target_order='check',order='check'):
 					return Variable(formule[i],target_order=target_order,notation='Polish')
 				i+=1
 		if order=='post':
-			return Tokenize(formule[::-1],notation='Polish',order='pre')
+			i=l-1
+			while i>=0:
+				if formule[i] in 'ACKE':
+					jump=polish_notation.find_half_of_token(formule[::-1])
+					print(jump)
+					return polish_notation.keywords[formule[i]](Tokenize(formule[:i-jump+1],target_order=target_order,notation='Polish',order='post'),Tokenize(formule[i-jump+1:i],target_order=target_order,notation='Polish',order='post'),notation='Polish',target_order=target_order)
+				if formule[i] == 'N':
+					return Tokenize(formule[:i],notation='Polish',order='post',target_order=target_order).change_negation()
+				if formule[i] in string.ascii_lowercase:
+					return Variable(formule[i],target_order=target_order,notation='Polish')
+				i-=1
 	print('Error: not implemented yet or wrong formule')
